@@ -16,9 +16,9 @@ router.get('/criminals', getAllCriminals);
 router.get('/visitors', getAllVisitors);
 router.get('/policeStation', getAllPoliceStations);
 router.get('/pendingrequests', isAdmin,getPendingUpdateRequests);
-router.get('/:stationId', getSinglePoliceStation);
+router.get('/station/:stationId', getSinglePoliceStation);
 router.get('/officer/:officerId', getSingleOfficer);
-router.get('/:criminalId', getSingleCriminal);
+router.get('/criminal/:criminalId', getSingleCriminal);
 
 router.post("/search", Search)
 router.post("/addStation", createPoliceStation)
