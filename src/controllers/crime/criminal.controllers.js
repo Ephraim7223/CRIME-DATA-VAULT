@@ -19,7 +19,7 @@ export const addCriminal = async(req, res) => {
         return res.status(400).json(formatZodError(addCriminalResult.error.issues));
     }
     try{
-      const criminal = await Criminal.findOne({firstname:req.body.firstname});
+      const criminal = await Criminal.findOne({ID: req.body.ID});
         if (criminal) {
           res.status(409).json({message: "Criminal already exists"})
     } else {
