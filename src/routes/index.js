@@ -7,7 +7,6 @@ import adminRoutes from "./admin/admin.routes.js";
 
 
 const routers = (app) => {
-  // app.use("/criminals", criminalRoutes);
   app.use("/visitors", visitorRoutes);
   app.use("/officers", officerRoutes);  
   app.use("/general", generalRoutes);

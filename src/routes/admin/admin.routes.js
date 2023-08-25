@@ -8,7 +8,7 @@ import { officerSignup } from "../../controllers/user/officerAuth_controller.js"
 import { Search } from "../../controllers/search.controller.js";
 import {  approveUpdateRequest, rejectUpdateRequest } from "../../controllers/admin/adminUpdate.controller.js";
 import { isAdmin } from "../../controllers/admin/isAdmin.controller.js";
-import { getPendingUpdateRequests } from "../../controllers/admin/pendingUpdate.js";
+import { getPendingUpdateRequests, getSinglePendingUpdateRequest } from "../../controllers/admin/pendingUpdate.js";
 
 // router.use(isAdmin);
 router.get('/officers', getAllOfficers);
@@ -19,6 +19,7 @@ router.get('/pendingrequests', isAdmin,getPendingUpdateRequests);
 router.get('/station/:stationId', getSinglePoliceStation);
 router.get('/officer/:officerId', getSingleOfficer);
 router.get('/criminal/:criminalId', getSingleCriminal);
+router.get("/pendingrequests/:requestId", getSinglePendingUpdateRequest)
 
 router.post("/search", Search)
 router.post("/addStation", createPoliceStation)

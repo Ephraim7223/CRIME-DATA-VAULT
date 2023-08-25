@@ -19,8 +19,7 @@ export const addCriminal = async(req, res) => {
         return res.status(400).json(formatZodError(addCriminalResult.error.issues));
     }
     try{
-      const criminalId = req.body.criminalId;
-      const criminal = await Criminal.findOne();
+      const criminal = await Criminal.findOne({firstname:req.body.firstname});
         if (criminal) {
           res.status(409).json({message: "Criminal already exists"})
     } else {
@@ -60,7 +59,7 @@ export const addCriminal = async(req, res) => {
         const firstLetter = firstname.charAt(0).toUpperCase();
         const lastLetter = lastname.charAt(0).toUpperCase();
         // const randomNumber = generateRandomNumber(3);
-        const increasedNumber = generateRandomNumber(3, 1);
+        const increasedNumber = generateRandomNumber(4, 1);
         const criminalId = `CRIMINAL${firstLetter}${increasedNumber}${lastLetter}`
         // const imageUrl = req.file.path;
         // const fingerPrintUrl = req.file.path 

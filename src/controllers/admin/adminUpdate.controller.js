@@ -1,15 +1,6 @@
 import PendingUpdateRequest from '../../models/pending/pending.model.js';
 import Criminal from '../../models/criminal/criminal.models.js';
 
-const updateCriminalData = async (criminal, fieldsToUpdate, newData) => {
-  for (const field of fieldsToUpdate) {
-    if (newData.hasOwnProperty(field)) {
-      criminal[field] = newData[field];
-    }
-  }
-  await criminal.save();
-};
-
 export const approveUpdateRequest = async (req, res) => {
   try {
     const requestId = req.params.requestId;
@@ -22,10 +13,8 @@ export const approveUpdateRequest = async (req, res) => {
       });
     }
 
-    const updatedFields = updateRequest.fieldsToUpdate;
-
+    // Apply the updates to the criminal's data
     const criminal = await Criminal.findById(updateRequest.originalData.criminalId);
-
     if (!criminal) {
       return res.status(404).json({
         success: false,
@@ -33,27 +22,44 @@ export const approveUpdateRequest = async (req, res) => {
       });
     }
 
-    await updateCriminalData(criminal, updatedFields, updateRequest.dataToUpdate);
+    const newData = updateRequest.dataToUpdate;
+    const updatedFields = [];
+
+    for (const field in newData) {
+      if (criminal[field] !== newData[field]) {
+        // Validate the data before updating
+        if (field === 'DOB' && !isValidDate(newData[field])) {
+          return res.status(400).json({
+            success: false,
+            message: `Invalid date of birth: ${newData[field]}`,
+          });
+        }
+
+        criminal[field] = newData[field];
+        updatedFields.push(field);
+      }
+    }
 
     // Update the approval status
-    updateRequest.isApproved = true; // or false for rejection
-    // Add adminComments if needed
-    updateRequest.adminComments = req.body.adminComments;
-
-    // Set the admin decision to 'approved'
-    updateRequest.adminDecision = 'approved';
-
-    // Save the updated updateRequest
+    updateRequest.isApproved = true;
     await updateRequest.save();
+    await criminal.save();
 
     res.status(200).json({
       success: true,
       message: 'Update request approved and corresponding data updated!',
+      updatedFields: updatedFields,
     });
   } catch (err) {
     res.status(500).json({ message: err.message });
   }
 };
+
+function isValidDate(dateString) {
+  return !isNaN(Date.parse(dateString));
+}
+
+
 
 export const rejectUpdateRequest = async (req, res) => {
   try {
