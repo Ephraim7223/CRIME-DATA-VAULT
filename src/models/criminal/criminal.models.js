@@ -46,7 +46,7 @@ const criminalSchema = new mongoose.Schema({
     category: {
         type: String,
         required: true,
-        enum:["Robbery/Theft","Murder","Sexual Assault","Cybercrime","Kidnapping"],
+        enum:["Robbery","Murder","Sexual Assault","Cybercrime","Kidnapping"],
     },
     reportedBy: {
         type: String,
