@@ -15,9 +15,14 @@ function generateRandomNumber(digits){
         return res.status(400).json(formatZodError(addVisitorResult.error.issues));
     }
     try{
+      const image = req.file;
       const visitor = await Visitor.findOne({  });
         if (visitor) {
           res.status(409).json({message: "Visitor already exists"})
+        if(image){
+          const imageUrl= image.url || image.path;
+          formData.image = imageUrl;
+        }
     } else {
         const eyecolor = req.body.eyecolor
         const haircolor = req.body.haircolor
@@ -26,7 +31,6 @@ function generateRandomNumber(digits){
         const occupation = req.body.occupation
         const weight = req.body.weight
         const height = req.body.height
-        const phoneNumber = req.body.phoneNumber
         const town = req.body.town
         const state = req.body.state
         const lastVisitDate = req.body.lastVisitDate
@@ -82,7 +86,7 @@ function generateRandomNumber(digits){
             DOB:DOB,
             occupation:occupation,
             town:town,
-            phoneNumber:phoneNumber,
+            contactLine:contactLine,
             state:state,
             gender:gender,
             height:height,

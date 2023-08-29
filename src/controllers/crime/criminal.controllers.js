@@ -19,9 +19,14 @@ export const addCriminal = async(req, res) => {
         return res.status(400).json(formatZodError(addCriminalResult.error.issues));
     }
     try{
+      const image = req.file;
       const criminal = await Criminal.findOne({ID: req.body.ID});
         if (criminal) {
           res.status(409).json({message: "Criminal already exists"})
+    if(image){
+      const imageUrl = image.url || image.path;
+      formData.image = imageUrl;
+    }
     } else {
         const eyecolor = req.body.eyecolor
         const haircolor = req.body.haircolor

@@ -108,7 +108,7 @@ export const officerLogin = async (req, res) => {
     const officer = await Officer.findOne({ID:officerID});
 
     if (!officer) {
-      return res.json({message:'write a real officer details'});
+      return res.json({message:'Please input valid details'});
     }else{ 
       const ID = req.body.ID;
       const password = req.body.password;

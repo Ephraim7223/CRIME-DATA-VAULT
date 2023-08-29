@@ -46,11 +46,11 @@ const criminalSchema = new mongoose.Schema({
     category: {
         type: String,
         required: true,
+        enum:["Robbery/Theft","Murder","Sexual Assault","Cybercrime","Kidnapping"],
     },
     reportedBy: {
         type: String,
         required: true,
-        default: " "
     },
     duration: {
         type: String,
@@ -59,12 +59,10 @@ const criminalSchema = new mongoose.Schema({
     nationality:{
         type: String,
         required: true,
-        default: " "
     },
     complexion:{
         type: String,
         required: true,
-        default: " "
     },
     LGA: {
         type: String,
