@@ -13,8 +13,8 @@ import upload from "../../config/multer.js"
 router.get('/criminals', getAllCriminals);
 router.get('/visitors', getAllVisitors);
 
-router.get('/criminal/:criminalId', getSingleCriminal);
-router.get('/visitor/:visitorId', getSingleVisitor);
+router.get('/:criminalId', getSingleCriminal);
+router.get('/:visitorId', getSingleVisitor);
 
 router.post('/register', officerSignup);
 router.post('/login', officerLogin);
