@@ -34,4 +34,5 @@ export const addCriminalValidator =z.object({
     correctionalCenter:z.string(),
     maritalStatus:z.string(),
     contactRelationship:z.string(),
+    complexion:z.string(),
 })

@@ -19,10 +19,10 @@ function generateRandomNumber(digits){
       const visitor = await Visitor.findOne({  });
         if (visitor) {
           res.status(409).json({message: "Visitor already exists"})
-          if (image) {
-            const imageUrl = image.url || image.path;
-            visitor.image = imageUrl;
-          }
+        if(image){
+          const imageUrl= image.url || image.path;
+          formData.image = imageUrl;
+        }
     } else {
         const eyecolor = req.body.eyecolor
         const haircolor = req.body.haircolor

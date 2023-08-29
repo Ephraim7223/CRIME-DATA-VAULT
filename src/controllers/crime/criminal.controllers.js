@@ -23,10 +23,10 @@ export const addCriminal = async(req, res) => {
       const criminal = await Criminal.findOne({ID: req.body.ID});
         if (criminal) {
           res.status(409).json({message: "Criminal already exists"})
-          if (image) {
-            const imageUrl = image.url || image.path;
-            criminal.image = imageUrl;
-          }
+    if(image){
+      const imageUrl = image.url || image.path;
+      formData.image = imageUrl;
+    }
     } else {
         const eyecolor = req.body.eyecolor
         const haircolor = req.body.haircolor
@@ -96,6 +96,7 @@ export const addCriminal = async(req, res) => {
             middlename: middlename,
             maritalStatus:maritalStatus,
             sentence: sentence,
+            complexion:complexion,
             dateCommitted: dateCommitted,
             dateConvicted: dateConvicted,
             nationality:nationality,
