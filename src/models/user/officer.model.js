@@ -40,6 +40,7 @@ const officerSchema = new Schema({
     policeId: {
         type: String,
         required: true,
+        unique: true
     },   
     nextOfKinAddress: {
         type: String,
