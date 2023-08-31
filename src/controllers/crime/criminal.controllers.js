@@ -24,12 +24,26 @@ function calculateAge(dateOfBirth) {
   return age;
 }
 
+function isValidDate(date) {
+  const currentDate = new Date();
+  const inputDate = new Date(date);
+  return inputDate <= currentDate;
+}
+
 export const addCriminal = async(req, res) => {
 
     const addCriminalResult = addCriminalValidator.safeParse(req.body);
     if (!addCriminalResult.success) {
         return res.status(400).json(formatZodError(addCriminalResult.error.issues));
     }
+    const dateCommitted = req.body.dateCommitted;
+    const dateConvicted = req.body.dateConvicted;
+  
+    // Check if dateCommitted and dateConvicted are valid
+    if (!isValidDate(dateCommitted) || !isValidDate(dateConvicted)) {
+      return res.status(400).json({ error: "Invalid dates. Dates cannot be in the future." });
+    }
+  
     try{
       const image = req.file;
       const criminal = await Criminal.findOne({ID: req.body.ID});
@@ -40,6 +54,10 @@ export const addCriminal = async(req, res) => {
          formData.image = imageUrl;
         } else {
          res.status(400).json({ error: "Image not entered" });
+       }
+       const existingCriminalWithImage = await Criminal.findOne({ image: image.url || image.path });
+       if (existingCriminalWithImage) {
+         return res.status(409).json({ message: "Image already used by another criminal" });
        }
     } else {
         const eyecolor = req.body.eyecolor
@@ -58,8 +76,8 @@ export const addCriminal = async(req, res) => {
         const complexion = req.body.complexion
         const DOB = req.body.DOB
         const contactaddress = req.body.contactaddress
-        const dateCommitted = req.body.dateCommitted
-        const dateConvicted = req.body.dateConvicted
+        // const dateCommitted = req.body.dateCommitted
+        // const dateConvicted = req.body.dateConvicted
         const sentence = req.body.sentence
         const LGA = req.body.LGA
         const reportedBy = req.body.reportedBy
@@ -85,25 +103,30 @@ export const addCriminal = async(req, res) => {
     
         const urls = [];
         const CriminalsFile = req.files;
-        for (const field in CriminalsFile) {
-          const files = CriminalsFile[field];
-          for (const file of files) {
-            const { path, fieldname } = file;
-            urls.push({[fieldname]: path});
-           };
-        };
+        
+        if (CriminalsFile) { // Check if files are uploaded
+          for (const field in CriminalsFile) {
+            const files = CriminalsFile[field];
+            for (const file of files) {
+              const { path, fieldname } = file;
+              urls.push({ [fieldname]: path });
+            }
+          }
+        }
+        
         // console.log("urls", urls)
         
         const newCriminal = new Criminal({
             ID: criminalId,
             firstname: firstname,
-            image : urls[0].image,
-            fingerPrints: urls[1].fingerPrints,
+            // image: image.url || image.path,
+            image: urls.find(url => url.hasOwnProperty('image'))?.image,
+            // fingerPrints: urls[1].fingerPrints,
             // image: imageUrl,
             // fingerPrint: fingerPrintUrl,
             complexions:complexion,
             Contactfirstname: Contactfirstname,
-            // fingerPrints: urls[1].fingerPrints,
+            fingerPrints: urls.find(url => url.hasOwnProperty('fingerPrints'))?.fingerPrints,
             Contactlastname : Contactlastname,
             Contactmiddlename : Contactmiddlename,
             contactaddress:contactaddress,
