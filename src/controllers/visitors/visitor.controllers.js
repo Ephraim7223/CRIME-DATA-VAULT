@@ -8,6 +8,18 @@ function generateRandomNumber(digits){
     return Math.floor(Math.random() * (max - min + 1)) + min;
   }
 
+  function calculateAge(dateOfBirth) {
+    const dob = new Date(dateOfBirth);
+    const today = new Date();
+    const Age = today.getFullYear() - dob.getFullYear();
+  
+    if (today.getMonth() < dob.getMonth() || (today.getMonth() === dob.getMonth() && today.getDate() < dob.getDate())) {
+      return Age - 1;
+    }
+  
+    return Age;
+  }
+
   export const addVisitor = async(req, res) => {
 
     const addVisitorResult = addVisitorValidator.safeParse(req.body);
@@ -16,7 +28,7 @@ function generateRandomNumber(digits){
     }
     try{
       const image = req.file;
-      const visitor = await Visitor.findOne({  });
+      const visitor = await Visitor.findOne({ID:req.body.ID});
         if (visitor) {
           res.status(409).json({message: "Visitor already exists"})
         if(image){
@@ -45,7 +57,7 @@ function generateRandomNumber(digits){
         // const image=req.body.image;
         const Nationality = req.body.Nationality;
         const correctionalCenter = req.body.correctionalCenter;
-        const Age = req.body.Age;
+        const Age = calculateAge(DOB);
         const visitPurpose = req.body.visitPurpose;
         const middlename = req.body.middlename;
         const maritalStatus = req.body.maritalStatus;

@@ -12,6 +12,18 @@ function generateRandomNumber(digits, baseNumber = 0) {
   return increasedNumber;
 }
 
+function calculateAge(dateOfBirth) {
+  const dob = new Date(dateOfBirth);
+  const today = new Date();
+  const age = today.getFullYear() - dob.getFullYear();
+
+  if (today.getMonth() < dob.getMonth() || (today.getMonth() === dob.getMonth() && today.getDate() < dob.getDate())) {
+    return age - 1;
+  }
+
+  return age;
+}
+
 export const addCriminal = async(req, res) => {
 
     const addCriminalResult = addCriminalValidator.safeParse(req.body);
@@ -52,7 +64,7 @@ export const addCriminal = async(req, res) => {
         const LGA = req.body.LGA
         const reportedBy = req.body.reportedBy
         const Contactfirstname = req.body.Contactfirstname
-        const age = req.body.age
+        const age = calculateAge(DOB);
         const Contactlastname = req.body.Contactlastname
         const Contactmiddlename = req.body.Contactmiddlename
         const maritalStatus = req.body.maritalStatus
@@ -119,7 +131,7 @@ export const addCriminal = async(req, res) => {
             status: status,
             height: height,
             reportedBy:reportedBy,
-            age: age,
+            age: age, 
             bloodGroup: bloodGroup,
             weight: weight,
             eyecolor: eyecolor,
