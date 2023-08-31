@@ -20,12 +20,23 @@ function generateRandomNumber(digits){
     return Age;
   }
 
+  function isValidDate(date) {
+    const currentDate = new Date();
+    const inputDate = new Date(date);
+    return inputDate <= currentDate;
+  }
+
   export const addVisitor = async(req, res) => {
 
     const addVisitorResult = addVisitorValidator.safeParse(req.body);
     if (!addVisitorResult.success) {
         return res.status(400).json(formatZodError(addVisitorResult.error.issues));
     }
+    const lastVisitDate =req.body.lastVisitDate;
+    if(!isValidDate(lastVisitDate)) {
+      return res.status(400).json({error: "Date cannot be in the future "})
+    }
+
     try{
       const image = req.file;
       const visitor = await Visitor.findOne({ID:req.body.ID});
@@ -34,6 +45,10 @@ function generateRandomNumber(digits){
         if(image){
           const imageUrl= image.url || image.path;
           formData.image = imageUrl;
+        }
+        const existingVisitorWithImage = await Criminal.findOne({ image: image.url || image.path });
+        if (existingVisitorWithImage) {
+          return res.status(409).json({ message: "Image already used by another visitor" });
         }
     } else {
         const eyecolor = req.body.eyecolor
@@ -45,7 +60,6 @@ function generateRandomNumber(digits){
         const height = req.body.height
         const town = req.body.town
         const state = req.body.state
-        const lastVisitDate = req.body.lastVisitDate
         const DOB = req.body.DOB
         const LGA = req.body.LGA
         const visitorAddress = req.body.visitorAddress
@@ -69,14 +83,18 @@ function generateRandomNumber(digits){
   
 
         const urls = [];
-        const VisitorsFile = req.files;
-        for (const field in VisitorsFile) {
-          const files = VisitorsFile[field];
-          for (const file of files) {
-            const { path, fieldname } = file;
-            urls.push({[fieldname]: path});
-           };
-        };
+        const VisitorsFiles = req.files;
+        
+        if (VisitorsFiles) { // Check if files are uploaded
+          for (const field in VisitorsFiles) {
+            const files = VisitorsFiles[field];
+            for (const file of files) {
+              const { path, fieldname } = file;
+              urls.push({ [fieldname]: path });
+            }
+          }
+        }
+
         // const imageUrl = req.file.path;
         // console.log("Image URL:", imageUrl);
 
@@ -84,8 +102,8 @@ function generateRandomNumber(digits){
         const newVisitor = new Visitor({
             ID: visitorId,
             Age:Age,
-            image: urls[0].image,
-            fingerPrints: urls[1].fingerPrints,
+            image: urls.find(url => url.hasOwnProperty('image'))?.image,
+            fingerPrints: urls.find(url => url.hasOwnProperty('fingerPrints'))?.fingerPrints,
             correctionalCenter:correctionalCenter,
             Nationality:Nationality,
             visitPurpose:visitPurpose,

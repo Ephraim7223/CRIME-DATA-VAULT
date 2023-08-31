@@ -4,7 +4,7 @@ import  { z } from "zod";
 export const registerValidator = z.object({
     firstname: z.string().min({message:"invalid name"}),
     lastname: z.string().min({message:"invalid name"}),
-    email: z.string().email({message: "ensure it is a valid email"}),
+    email: z.string(),
     // role: z.enum(["Admin", "Officer"]),
     password:z.string().min(8)
 }).required({message:"Fill all the field with the correct details"})

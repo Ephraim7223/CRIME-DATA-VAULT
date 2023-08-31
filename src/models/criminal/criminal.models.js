@@ -26,7 +26,8 @@ const criminalSchema = new mongoose.Schema({
         required: true,
         min: 4,
         max: 30,
-    },    Age: {
+    },   
+     Age: {
         type: String,
         required: true,
         default: " ",

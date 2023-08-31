@@ -88,12 +88,20 @@ const VisitorSchema = new mongoose.Schema({
     maritalStatus : {
         type: String,
         required: true,
-        default: " "
+        default: " ",
+        enum:["Married", "Single", "Divorced"]
+    },
+    fingerPrints: {
+        type: String,
+        required: true
+    },
+    image: {
+        type: String,
+        required: true,
     },
         contactLine :{
             type: String,
             required: true,
-            default: " "
         },
         visitorAddress : {
             type: String,

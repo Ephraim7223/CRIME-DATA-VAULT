@@ -65,7 +65,10 @@ const officerSchema = new Schema({
     email: {
         type: String,
         required: true,
-        unique: true  // Fixed typo here
+        unique: true,
+        lowercase: true,
+        trim: true,
+        match: [/\S+@\S+\.\S+/, 'Invalid email address'],
     },
     currentStation: {
         type:String,
@@ -114,5 +117,14 @@ const officerSchema = new Schema({
 }, {
     timestamps: true
 });
+
+// Define a pre-save hook to remove spaces from the email
+officerSchema.pre('save', function(next) {
+    if (this.email) {
+        this.email = this.email.replace(/\s/g, ''); // Remove all spaces
+    }
+    next();
+});
+
 
 export default model("Officer", officerSchema)
