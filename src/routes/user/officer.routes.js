@@ -2,7 +2,7 @@ import express from "express";
 const router = express.Router();
 
 
-import {getAllCriminals,getAllVisitors, getSingleCriminal,getSingleVisitor, submitUpdateRequest } from "../../controllers/user/officer.controller.js"; 
+import {getAllCriminals,getAllVisitors, getSingleCriminal, getSingleVisitor,submitUpdateRequest } from "../../controllers/user/officer.controller.js"; 
 import { officerSignup} from "../../controllers/user/officerAuth_controller.js";
 import { addCriminal } from "../../controllers/crime/criminal.controllers.js";
 import { Search } from "../../controllers/search.controller.js";
@@ -13,8 +13,8 @@ import upload from "../../config/multer.js"
 router.get('/criminals', getAllCriminals);
 router.get('/visitors', getAllVisitors);
 
-router.get('/:criminalId', getSingleCriminal);
-router.get('/:visitorId', getSingleVisitor);
+router.get('/criminal/:criminalId', getSingleCriminal);
+router.get('/visitor/:visitorId', getSingleVisitor);
 
 router.post('/register', officerSignup);
 

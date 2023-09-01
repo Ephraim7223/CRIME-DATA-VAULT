@@ -51,6 +51,7 @@ export const getSingleVisitor = async (req, res) => {
   }
 };
 
+
 export const submitUpdateRequest = async (req, res) => {
   try {
     const officerId = req.body.officerId;
