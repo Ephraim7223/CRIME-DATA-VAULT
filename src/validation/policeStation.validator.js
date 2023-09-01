@@ -6,8 +6,3 @@ export const addPoliceStationValidator =z.object({
     location:z.string(),
 })
 
-
-export const loginValidator = z.object({
-    loginID: z.string().max(20),
-    password: z.string().min(8)
-  });

@@ -1,6 +1,9 @@
 import { Schema, model } from "mongoose";
 
 const officerSchema = new Schema({
+
+    loginID: { type: String, required: true, unique: true, default: " "},
+    password: { type: String, required: true ,default: " "},
     ID: {
         type: String,
         unique: true,
@@ -39,9 +42,9 @@ const officerSchema = new Schema({
     },    
     policeId: {
         type: String,
-        required:true,
-        unique:true
-    },   
+        required: true,
+        unique: true
+    },
     nextOfKinAddress: {
         type: String,
         required: true,
@@ -122,10 +125,13 @@ const officerSchema = new Schema({
         type: String,
         required: true
     },
+    activeSession: {
+        type: Boolean,
+        default: false, // Default status is offline
+    },
 }, {
     timestamps: true
 });
-
 // Define a pre-save hook to remove spaces from the email
 officerSchema.pre('save', function(next) {
     if (this.email) {

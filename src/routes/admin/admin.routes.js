@@ -38,7 +38,7 @@ router.patch("/reject/:requestId", isAdmin,rejectUpdateRequest);
 
 router.post('/login', adminLogin);
 
-router.put('/Assign/:officerID/assign-station/:stationID', assignOfficerToStation);
+router.post('/assign-station', assignOfficerToStation);
 router.patch('/:criminalId', updateCriminal);
 router.post("/logut", adminLogout)
 

@@ -9,6 +9,37 @@ function generateRandomNumber(digits){
   return Math.floor(Math.random() * (max - min + 1)) + min;
 }
 
+
+// Function to generate a unique login ID for the officer
+function generateUniqueLoginID() {
+  const loginIDLength = 6; // You can adjust the login ID length as per your requirements
+  const randomLoginID = generateRandomAlphaNumeric(loginIDLength);
+  return `OFFICER${randomLoginID}`;
+}
+
+// Function to generate random alphanumeric strings
+function generateRandomAlphaNumeric(length) {
+  const charset = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+  let result = '';
+  for (let i = 0; i < length; i++) {
+    const randomIndex = Math.floor(Math.random() * charset.length);
+    result += charset.charAt(randomIndex);
+  }
+  return result;
+}
+
+// Function to generate a random alphanumeric password
+function generateRandomPassword(length = 8) {
+  const charset = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+  let password = '';
+  for (let i = 0; i < length; i++) {
+    const randomIndex = Math.floor(Math.random() * charset.length);
+    password += charset.charAt(randomIndex);
+  }
+  return password;
+}
+
+
 // Create a new police station
 export const createPoliceStation = async (req, res) => {
   const addStationResult = addPoliceStationValidator.safeParse(req.body);
@@ -93,40 +124,45 @@ export const createPoliceStation = async (req, res) => {
       res.status(500).json({ error: 'Failed to delete police station' });
     }
   };
-  
-import crypto from 'crypto';
+
 import bcrypt from 'bcrypt';
 
 export const assignOfficerToStation = async (req, res) => {
   try {
-    const { officerID, stationID } = req.params;
+    const { officerID, stationID } = req.body;
 
     // Find the officer by ID
-    const officer = await Officer.findById(officerID);
+    const officer = await Officer.findOne({ ID: officerID });
+
     if (!officer) {
       return res.status(404).json({ error: 'Officer not found' });
     }
 
     // Find the police station by ID
-    const policeStation = await PoliceStation.findById(stationID);
+    const policeStation = await PoliceStation.findOne({ ID: stationID });
+
     if (!policeStation) {
       return res.status(404).json({ error: 'Police station not found' });
     }
 
     // Generate a unique login ID for the officer
-    const loginID = generateUniqueLoginID();
-
-    // Assign the officer to the police station
-    officer.station = policeStation._id;
-    officer.loginID = loginID; // Assign the generated login ID to the officer
-    await officer.save();
+    const loginID = generateUniqueLoginID(); // Implement the logic to generate a unique login ID
 
     // Generate a random password for the officer
-    const randomPassword = generateRandomPassword();
+    const randomPassword = generateRandomPassword(); // Implement the logic to generate a random password
 
     // Hash the password before saving it to the officer's document
     const hashedPassword = await bcrypt.hash(randomPassword, 10);
+
+    // Set the generated login ID and hashed password on the officer document
+    officer.loginID = loginID;
     officer.password = hashedPassword;
+
+    // Assign the officer to the police station
+    officer.station = policeStation._id;
+    officer.assignDate = new Date();
+
+    // Save the updated officer document
     await officer.save();
 
     // Update the police station to include the officer in its officers array
@@ -135,28 +171,11 @@ export const assignOfficerToStation = async (req, res) => {
 
     res.json({ 
       message: 'Officer assigned to the police station successfully', 
-      loginID: loginID, // Include the generated login ID in the response
-      password: randomPassword 
+      loginID: loginID,
+      password: randomPassword
     });
   } catch (error) {
+    console.error('Error assigning officer:', error);
     res.status(500).json({ error: 'Failed to assign officer to the police station' });
   }
 };
-
-// Function to generate a unique login ID for the officer
-function generateUniqueLoginID() {
-  const loginIDLength = 6; // You can adjust the login ID length as per your requirements
-  const randomLoginID = generateRandomAlphaNumeric(loginIDLength);
-  return `OFFICER${randomLoginID}`;
-}
-
-// Function to generate random alphanumeric strings
-function generateRandomAlphaNumeric(length) {
-  const charset = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
-  let result = '';
-  for (let i = 0; i < length; i++) {
-    const randomIndex = Math.floor(Math.random() * charset.length);
-    result += charset.charAt(randomIndex);
-  }
-  return result;
-}

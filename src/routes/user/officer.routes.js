@@ -3,7 +3,7 @@ const router = express.Router();
 
 
 import {getAllCriminals,getAllVisitors, getSingleCriminal, getSingleVisitor,submitUpdateRequest } from "../../controllers/user/officer.controller.js"; 
-import { officerSignup} from "../../controllers/user/officerAuth_controller.js";
+import { officerSignup, officerLogin} from "../../controllers/user/officerAuth_controller.js";
 import { addCriminal } from "../../controllers/crime/criminal.controllers.js";
 import { Search } from "../../controllers/search.controller.js";
 import { addVisitor } from "../../controllers/visitors/visitor.controllers.js";
@@ -17,6 +17,7 @@ router.get('/criminal/:criminalId', getSingleCriminal);
 router.get('/visitor/:visitorId', getSingleVisitor);
 
 router.post('/register', officerSignup);
+router.post('/login', officerLogin);
 
 router.post("/addcriminal", 
 upload("criminals").fields([{

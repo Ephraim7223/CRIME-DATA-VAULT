@@ -1,5 +1,5 @@
 import Officer from "../../models/user/officer.model.js";
-import { registerValidator } from "../../validation/officer.validator.js"
+import { registerValidator ,loginValidator} from "../../validation/officer.validator.js"
 import { formatZodError } from "../../utils/errorMessage.js";
 import  cryptoHash from "crypto"
 
@@ -27,23 +27,12 @@ function calculateAge(dateOfBirth) {
   return age;
 }
 
-// function isValidDate(date) {
-//   const currentDate = new Date();
-//   const inputDate = new Date(date);
-//   return inputDate <= currentDate;
-// }
-
 export const officerSignup = async(req, res) => {
 
   const signupResult = registerValidator.safeParse(req.body);
   if (!signupResult.success) {
       return res.status(400).json(formatZodError(signupResult.error.issues));
   }
-  // const appointmentDate = req.body.appointmentDate;
-
-  // if (!isValidDate(appointmentDate)) {
-  //   return res.status(400).json({ error: "Invalid dates. Dates cannot be in the future." });
-  // }
 
   try{
     const image = req.file;
@@ -93,23 +82,6 @@ export const officerSignup = async(req, res) => {
       const contactLine = parseInt(req.body.contactLine, 10);
       const nextOfKinContact = parseInt(req.body.nextOfKinContact, 10);
   
-
-      // const urls = [];
-      // const OfficersFiles = req.files;
-      
-      // if (OfficersFile) { // Check if files are uploaded
-      //   for (const field in OfficersFile) {
-      //     const files = OfficersFile[field];
-      //     for (const file of files) {
-      //       const { path, fieldname, mimetype } = file;
-      //       // Check if the file is an image based on its mimetype
-      //       if (mimetype.startsWith('image/')) {
-      //         urls.push({ [fieldname]: path });
-      //       }
-      //     }
-      //   }
-      // }
-
       const urls = [];
       const OfficersFiles = req.files;
       
@@ -165,56 +137,41 @@ export const officerSignup = async(req, res) => {
   }
 };
 
-// export const officerLogin = async (req, res) => {
-//   const loginResult = loginValidator.safeParse(req.body);
-//   if (!loginResult.success) {
-//     return res.status(401).json(formatZodError(loginResult.error.issues));
-//   }
-//    const officerID = req.body.ID
-//   try {
-//     const officer = await Officer.findOne({ID:officerID});
+import bcrypt from 'bcrypt';
 
-//     if (!officer) {
-//       return res.json({message:'Please input valid details'});
-//     }else{ 
-//       const ID = req.body.ID;
-//       const password = req.body.password;
-//       const officer = await Officer.findOne({ID});
+export const officerLogin = async (req, res) => {
+  const loginResult = loginValidator.safeParse(req.body);
+  const { loginID, password } = req.body;
   
-//       if (officer) {
-//         if (officer.password === " ") {
-//           const hashedPassword = await  hashValue(req.body.password)
-//           await Officer.updateOne({ ID: officer.ID }, { password: hashedPassword,verified:true , });
-//           res.status(200).json({ message: 'Password set and logged in.' })
-//         } else {
-//           const passwordMatched = await hashValue(password)
-          
-//           if (passwordMatched === officer.password) {
-//             res.status(200).json({ message: 'Logged in successfully.' })
-//             await Officer.updateOne({ ID: officer.ID }, { Status:'active' });
-//           } else {
-//             res.status(401).json({ message: 'Invalid credentials.' });
-//           }
-//         }
-//       }
-//        else {
-//         res.status(404).json({ message: 'officer not found.' });
-//       }
-  
-    
-//   } 
-// }catch (error) {
-//   console.log(error);
-//   return res.status(500).json({ message: 'Could not log in officer.' });
-// }}
+  if (!loginResult.success) {
+    return res.status(401).json(formatZodError(loginResult.error.issues));
+  }
 
-// export const officerLogout = async(req,res) => {
-//     res.clearCookie("accessToken", {
-//       sameSite: "none",
-//       secure: true,
-//     })
-//     .status(200)
-//     .json({
-//         message: "Officer has been logged out."
-//     });
-// }
+  try {
+    // Find the officer by loginID
+    const officer = await Officer.findOne({ loginID });
+
+    if (!officer) {
+      return res.status(404).json({ error: 'Officer not found' });
+    }
+
+    // Compare the provided password with the hashed password stored in the database
+    const passwordMatch = await bcrypt.compare(password, officer.password);
+
+    if (!passwordMatch) {
+      return res.status(401).json({ error: 'Incorrect password' });
+    }
+
+    // Assuming you have an "activeSession" field in your Officer model
+    // Set the officer's session as active
+    officer.activeSession = true;
+    await officer.save();
+
+    // Return a success message
+    res.status(200).json({ message: 'Login successful' });
+
+  } catch (error) {
+    console.error('Error during officer login:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+};
