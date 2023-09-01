@@ -94,52 +94,69 @@ export const createPoliceStation = async (req, res) => {
     }
   };
   
-  // Assign the officer to a station
-  import crypto from 'crypto';
-  import bcrypt from 'bcrypt';
-  
-  export const assignOfficerToStation = async (req, res) => {
-    try {
-      const { officerID, stationID } = req.params;
-  
-      // Find the officer by ID
-      const officer = await Officer.findById(officerID);
-      if (!officer) {
-        return res.status(404).json({ error: 'Officer not found' });
-      }
-  
-      // Find the police station by ID
-      const policeStation = await PoliceStation.findById(stationID);
-      if (!policeStation) {
-        return res.status(404).json({ error: 'Police station not found' });
-      }
-  
-      // Assign the officer to the police station
-      officer.station = policeStation._id;
-      await officer.save();
-  
-      // Generate a random password for the officer
-      const randomPassword = generateRandomPassword();
-  
-      // Hash the password before saving it to the officer's document
-      const hashedPassword = await bcrypt.hash(randomPassword, 10);
-      officer.password = hashedPassword;
-      await officer.save();
-  
-      // Update the police station to include the officer in its officers array
-      policeStation.officers.push(officer._id);
-      await policeStation.save();
-  
-      res.json({ message: 'Officer assigned to the police station successfully', password: randomPassword });
-    } catch (error) {
-      res.status(500).json({ error: 'Failed to assign officer to the police station' });
+import crypto from 'crypto';
+import bcrypt from 'bcrypt';
+
+export const assignOfficerToStation = async (req, res) => {
+  try {
+    const { officerID, stationID } = req.params;
+
+    // Find the officer by ID
+    const officer = await Officer.findById(officerID);
+    if (!officer) {
+      return res.status(404).json({ error: 'Officer not found' });
     }
-  };
-  
-  // Function to generate a random password using crypto
-  function generateRandomPassword() {
-    const passwordLength = 8; // You can adjust the password length as per your requirements
-    const randomBytes = crypto.randomBytes(passwordLength);
-    return randomBytes.toString('base64').slice(0, passwordLength);
+
+    // Find the police station by ID
+    const policeStation = await PoliceStation.findById(stationID);
+    if (!policeStation) {
+      return res.status(404).json({ error: 'Police station not found' });
+    }
+
+    // Generate a unique login ID for the officer
+    const loginID = generateUniqueLoginID();
+
+    // Assign the officer to the police station
+    officer.station = policeStation._id;
+    officer.loginID = loginID; // Assign the generated login ID to the officer
+    await officer.save();
+
+    // Generate a random password for the officer
+    const randomPassword = generateRandomPassword();
+
+    // Hash the password before saving it to the officer's document
+    const hashedPassword = await bcrypt.hash(randomPassword, 10);
+    officer.password = hashedPassword;
+    await officer.save();
+
+    // Update the police station to include the officer in its officers array
+    policeStation.officers.push(officer._id);
+    await policeStation.save();
+
+    res.json({ 
+      message: 'Officer assigned to the police station successfully', 
+      loginID: loginID, // Include the generated login ID in the response
+      password: randomPassword 
+    });
+  } catch (error) {
+    res.status(500).json({ error: 'Failed to assign officer to the police station' });
   }
-  
+};
+
+// Function to generate a unique login ID for the officer
+function generateUniqueLoginID() {
+  const loginIDLength = 6; // You can adjust the login ID length as per your requirements
+  const randomLoginID = generateRandomAlphaNumeric(loginIDLength);
+  return `OFFICER${randomLoginID}`;
+}
+
+// Function to generate random alphanumeric strings
+function generateRandomAlphaNumeric(length) {
+  const charset = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+  let result = '';
+  for (let i = 0; i < length; i++) {
+    const randomIndex = Math.floor(Math.random() * charset.length);
+    result += charset.charAt(randomIndex);
+  }
+  return result;
+}

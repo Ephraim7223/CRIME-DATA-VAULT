@@ -10,8 +10,8 @@ const upload = (role) => {
     folder = "CriminalsFile";
   } else if (role === "visitors") {
     folder = "VisitorsFiles";
-  } else if (role === "officers") { // Replace 'thirdRole' with the actual role name
-    folder = "OfficersFiles"; // Replace 'ThirdRoleFiles' with the appropriate folder name
+  } else if (role === "officers") { 
+    folder = "OfficersFiles"; 
   } else {
     throw new Error("Invalid role");
   }

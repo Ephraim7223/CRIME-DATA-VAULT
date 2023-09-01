@@ -9,6 +9,7 @@ import { Search } from "../../controllers/search.controller.js";
 import {  approveUpdateRequest, rejectUpdateRequest } from "../../controllers/admin/adminUpdate.controller.js";
 import { isAdmin } from "../../controllers/admin/isAdmin.controller.js";
 import { getPendingUpdateRequests, getSinglePendingUpdateRequest } from "../../controllers/admin/pendingUpdate.js";
+import upload from "../../config/multer.js"
 
 // router.use(isAdmin);
 router.get('/officers', getAllOfficers);
@@ -19,19 +20,25 @@ router.get('/pendingrequests', isAdmin,getPendingUpdateRequests);
 router.get('/station/:stationId', getSinglePoliceStation);
 router.get('/officer/:officerId', getSingleOfficer);
 router.get('/criminal/:criminalId', getSingleCriminal);
+router.get('/visitor/:visitorId', getSingleVisitor);
 router.get("/pendingrequests/:requestId", getSinglePendingUpdateRequest)
 
 router.post("/search", Search)
 router.post("/addStation", createPoliceStation)
 router.post('/', adminSignup);
-router.post('/officerSignup', officerSignup);
+router.post('/officerSignup', 
+upload("officers").fields([{
+    name : "image", maxCount : 1},
+     {name : "fingerPrints", maxCount : 1}
+    ])
+, officerSignup);
 
 router.patch("/approve/:requestId", isAdmin,approveUpdateRequest);
 router.patch("/reject/:requestId", isAdmin,rejectUpdateRequest);
 
 router.post('/login', adminLogin);
 
-router.put('/:officerId/assign-station/:stationId', assignOfficerToStation);
+router.put('/Assign/:officerID/assign-station/:stationID', assignOfficerToStation);
 router.patch('/:criminalId', updateCriminal);
 router.post("/logut", adminLogout)
 

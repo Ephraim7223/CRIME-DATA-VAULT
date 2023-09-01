@@ -29,9 +29,3 @@ export const registerValidator = z.object({
     lga: z.string(),
     rank:z.string(),
 }).required({message:"Fill all the field with the correct details"})
-
-export const loginValidator = z.object({
-    ID:z.string().max(20),
-    password:z.string().min(8)
-
-});

@@ -1,5 +1,5 @@
 import Officer from "../../models/user/officer.model.js";
-import { loginValidator, registerValidator } from "../../validation/officer.validator.js"
+import { registerValidator } from "../../validation/officer.validator.js"
 import { formatZodError } from "../../utils/errorMessage.js";
 import  cryptoHash from "crypto"
 
@@ -15,16 +15,53 @@ function generateRandomNumber(digits){
 //   return hash.digest('base64');
 // }
 
+
+function calculateAge(dateOfBirth) {
+  const dob = new Date(dateOfBirth);
+  const today = new Date();
+  const age = today.getFullYear() - dob.getFullYear();
+
+  if (today.getMonth() < dob.getMonth() || (today.getMonth() === dob.getMonth() && today.getDate() < dob.getDate())) {
+    return age - 1;
+  }
+
+  return age;
+}
+
+function isValidDate(date) {
+  const currentDate = new Date();
+  const inputDate = new Date(date);
+  return inputDate <= currentDate;
+}
+
+
 export const officerSignup = async(req, res) => {
 
   const signupResult = registerValidator.safeParse(req.body);
   if (!signupResult.success) {
       return res.status(400).json(formatZodError(signupResult.error.issues));
   }
+  const appointmentDate = req.body.appointmentDate;
+
+  if (!isValidDate(appointmentDate)) {
+    return res.status(400).json({ error: "Invalid dates. Dates cannot be in the future." });
+  }
+
   try{
+    const image = req.file;
     const officer = await Officer.findOne({email:req.body.email})
       if (officer) {
         res.status(409).json({message: "Officer already exists"})
+        if (image) {
+          const imageUrl = image.url || image.path;
+          formData.image = imageUrl;
+         } else {
+          res.status(400).json({ error: "Image not entered" });
+        }
+        const existingOfficerWithImage = await Officer.findOne({ image: image.url || image.path });
+        if (existingOfficerWithImage) {
+          return res.status(409).json({ message: "Image already used by another officer" });
+        }
   } else {
       // const encryptedPassword = hashValue(req.body.password)
       const middleName = req.body.middleName
@@ -44,7 +81,6 @@ export const officerSignup = async(req, res) => {
       const nextOfKinContact = req.body.nextOfKinContact
       const rank = req.body.rank
       const town = req.body.town
-      const appointmentDate = req.body.appointmentDate
       const contactLine = req.body.contactLine
       const policeId = req.body.policeId
       const maritalStatus = req.body.maritalStatus
@@ -58,11 +94,43 @@ export const officerSignup = async(req, res) => {
       const randomNumber = generateRandomNumber(5);
       const officerId = `OFFICER${firstLetter}${randomNumber}${lastLetter}`
 
+
+      // const urls = [];
+      // const OfficersFiles = req.files;
+      
+      // if (OfficersFile) { // Check if files are uploaded
+      //   for (const field in OfficersFile) {
+      //     const files = OfficersFile[field];
+      //     for (const file of files) {
+      //       const { path, fieldname, mimetype } = file;
+      //       // Check if the file is an image based on its mimetype
+      //       if (mimetype.startsWith('image/')) {
+      //         urls.push({ [fieldname]: path });
+      //       }
+      //     }
+      //   }
+      // }
+
+      const urls = [];
+      const OfficersFiles = req.files;
+      
+      if (OfficersFiles) { // Check if files are uploaded
+        for (const field in OfficersFiles) {
+          const files = OfficersFiles[field];
+          for (const file of files) {
+            const { path, fieldname } = file;
+            urls.push({ [fieldname]: path });
+          }
+        }
+      }
+
       const newOfficer = new Officer({
       ID: officerId,
       firstName: firstName,
       lastName: lastName,
       age: age,
+      image: urls.find(url => url.hasOwnProperty('image'))?.image,
+      fingerPrints: urls.find(url => url.hasOwnProperty('fingerPrints'))?.fingerPrints,
       middleName: middleName,
       name: firstName + " " + middleName + " " + lastName,
       email: email,
@@ -98,56 +166,56 @@ export const officerSignup = async(req, res) => {
   }
 };
 
-export const officerLogin = async (req, res) => {
-  const loginResult = loginValidator.safeParse(req.body);
-  if (!loginResult.success) {
-    return res.status(401).json(formatZodError(loginResult.error.issues));
-  }
-   const officerID = req.body.ID
-  try {
-    const officer = await Officer.findOne({ID:officerID});
+// export const officerLogin = async (req, res) => {
+//   const loginResult = loginValidator.safeParse(req.body);
+//   if (!loginResult.success) {
+//     return res.status(401).json(formatZodError(loginResult.error.issues));
+//   }
+//    const officerID = req.body.ID
+//   try {
+//     const officer = await Officer.findOne({ID:officerID});
 
-    if (!officer) {
-      return res.json({message:'Please input valid details'});
-    }else{ 
-      const ID = req.body.ID;
-      const password = req.body.password;
-      const officer = await Officer.findOne({ID});
+//     if (!officer) {
+//       return res.json({message:'Please input valid details'});
+//     }else{ 
+//       const ID = req.body.ID;
+//       const password = req.body.password;
+//       const officer = await Officer.findOne({ID});
   
-      if (officer) {
-        if (officer.password === " ") {
-          const hashedPassword = await  hashValue(req.body.password)
-          await Officer.updateOne({ ID: officer.ID }, { password: hashedPassword,verified:true , });
-          res.status(200).json({ message: 'Password set and logged in.' })
-        } else {
-          const passwordMatched = await hashValue(password)
+//       if (officer) {
+//         if (officer.password === " ") {
+//           const hashedPassword = await  hashValue(req.body.password)
+//           await Officer.updateOne({ ID: officer.ID }, { password: hashedPassword,verified:true , });
+//           res.status(200).json({ message: 'Password set and logged in.' })
+//         } else {
+//           const passwordMatched = await hashValue(password)
           
-          if (passwordMatched === officer.password) {
-            res.status(200).json({ message: 'Logged in successfully.' })
-            await Officer.updateOne({ ID: officer.ID }, { Status:'active' });
-          } else {
-            res.status(401).json({ message: 'Invalid credentials.' });
-          }
-        }
-      }
-       else {
-        res.status(404).json({ message: 'officer not found.' });
-      }
+//           if (passwordMatched === officer.password) {
+//             res.status(200).json({ message: 'Logged in successfully.' })
+//             await Officer.updateOne({ ID: officer.ID }, { Status:'active' });
+//           } else {
+//             res.status(401).json({ message: 'Invalid credentials.' });
+//           }
+//         }
+//       }
+//        else {
+//         res.status(404).json({ message: 'officer not found.' });
+//       }
   
     
-  } 
-}catch (error) {
-  console.log(error);
-  return res.status(500).json({ message: 'Could not log in officer.' });
-}}
+//   } 
+// }catch (error) {
+//   console.log(error);
+//   return res.status(500).json({ message: 'Could not log in officer.' });
+// }}
 
-export const officerLogout = async(req,res) => {
-    res.clearCookie("accessToken", {
-      sameSite: "none",
-      secure: true,
-    })
-    .status(200)
-    .json({
-        message: "Officer has been logged out."
-    });
-}
+// export const officerLogout = async(req,res) => {
+//     res.clearCookie("accessToken", {
+//       sameSite: "none",
+//       secure: true,
+//     })
+//     .status(200)
+//     .json({
+//         message: "Officer has been logged out."
+//     });
+// }

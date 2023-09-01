@@ -97,3 +97,41 @@
 
 
 
+
+
+export const assignOfficerToStation = async (req, res) => {
+    try {
+      // ... (existing code)
+  
+      // Generate a unique login ID for the officer
+      const loginID = generateUniqueLoginID();
+  
+      // ... (existing code)
+  
+      res.json({ 
+        message: 'Officer assigned to the police station successfully', 
+        loginID: loginID,
+        password: randomPassword 
+      });
+    } catch (error) {
+      res.status(500).json({ error: 'Failed to assign officer to the police station' });
+    }
+  };
+  
+  // Function to generate a unique login ID for the officer
+  function generateUniqueLoginID() {
+    const loginIDLength = 6; // You can adjust the login ID length as per your requirements
+    const randomLoginID = generateRandomAlphaNumeric(loginIDLength);
+    return `OFFICER${randomLoginID}`;
+  }
+  
+  // Function to generate random alphanumeric strings
+  function generateRandomAlphaNumeric(length) {
+    const charset = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+    let result = '';
+    for (let i = 0; i < length; i++) {
+      const randomIndex = Math.floor(Math.random() * charset.length);
+      result += charset.charAt(randomIndex);
+    }
+    return result;
+  }

@@ -113,7 +113,15 @@ const officerSchema = new Schema({
     rank: {
         type:String,
         required: true
-    }
+    },
+    fingerPrints: {
+        type: String,
+        required: true,
+    },
+    image: {
+        type: String,
+        required: true
+    },
 }, {
     timestamps: true
 });
