@@ -5,11 +5,11 @@ export const registerValidator = z.object({
     firstName: z.string().min({message:"invalid name"}),
     middleName: z.string().min({message:"invalid name"}),
     lastName: z.string().min({message:"invalid name"}),
-    email: z.string().email({message: "ensure it is a valid email"}),
+    email: z.string(),
     // password:z.string().min(8).regex(/^(?=.*[A-Z])(?=.*\d)/, "Password must contain at least one capital letter and one number")
     nextOfKin: z.string(),
     nextOfKinAddress: z.string(),
-    nextOfKinContact: z.string(), 
+    nextOfKinContact: z.string().min(11).max(11), 
     height: z.string(),
     weight: z.string(),
     bloodGroup: z.string(),
