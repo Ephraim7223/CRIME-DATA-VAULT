@@ -26,7 +26,6 @@ upload("criminals").fields([{
 addCriminal);
 
 router.post("/search", Search)
-
 router.post("/addvisitor", 
 upload("visitors").fields([{
     name : "image", maxCount : 1},

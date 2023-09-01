@@ -27,7 +27,7 @@ export const addCriminalValidator =z.object({
     status:z.string(),
     haircolor:z.string(),
     contactaddress:z.string(),
-    contactLine:z.string(),
+    contactLine:z.string().min(11).max(11),
     sentence:z.string(),
     dateConvicted:z.string(),
     dateCommitted:z.string(),

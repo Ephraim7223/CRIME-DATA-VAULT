@@ -15,7 +15,6 @@ function generateRandomNumber(digits){
 //   return hash.digest('base64');
 // }
 
-
 function calculateAge(dateOfBirth) {
   const dob = new Date(dateOfBirth);
   const today = new Date();
@@ -28,12 +27,11 @@ function calculateAge(dateOfBirth) {
   return age;
 }
 
-function isValidDate(date) {
-  const currentDate = new Date();
-  const inputDate = new Date(date);
-  return inputDate <= currentDate;
-}
-
+// function isValidDate(date) {
+//   const currentDate = new Date();
+//   const inputDate = new Date(date);
+//   return inputDate <= currentDate;
+// }
 
 export const officerSignup = async(req, res) => {
 
@@ -41,11 +39,11 @@ export const officerSignup = async(req, res) => {
   if (!signupResult.success) {
       return res.status(400).json(formatZodError(signupResult.error.issues));
   }
-  const appointmentDate = req.body.appointmentDate;
+  // const appointmentDate = req.body.appointmentDate;
 
-  if (!isValidDate(appointmentDate)) {
-    return res.status(400).json({ error: "Invalid dates. Dates cannot be in the future." });
-  }
+  // if (!isValidDate(appointmentDate)) {
+  //   return res.status(400).json({ error: "Invalid dates. Dates cannot be in the future." });
+  // }
 
   try{
     const image = req.file;
@@ -65,7 +63,6 @@ export const officerSignup = async(req, res) => {
   } else {
       // const encryptedPassword = hashValue(req.body.password)
       const middleName = req.body.middleName
-      const age = req.body.age
       const email = req.body.email
       const address = req.body.address
       const gender = req.body.gender
@@ -78,10 +75,8 @@ export const officerSignup = async(req, res) => {
       const bloodGroup = req.body.bloodGroup
       const nextOfKin = req.body.nextOfKin
       const nextOfKinAddress = req.body.nextOfKinAddress
-      const nextOfKinContact = req.body.nextOfKinContact
       const rank = req.body.rank
       const town = req.body.town
-      const contactLine = req.body.contactLine
       const policeId = req.body.policeId
       const maritalStatus = req.body.maritalStatus
       const DOB = req.body.DOB
@@ -89,11 +84,15 @@ export const officerSignup = async(req, res) => {
       const currentStation = req.body.currentStation
       const firstName  = req.body.firstName;
       const lastName  = req.body.lastName;
+      const appointmentDate = req.body.appointmentDate;
+      const age = calculateAge(DOB)
       const firstLetter = firstName.charAt(0).toUpperCase();
       const lastLetter = lastName.charAt(0).toUpperCase();
       const randomNumber = generateRandomNumber(5);
       const officerId = `OFFICER${firstLetter}${randomNumber}${lastLetter}`
-
+      const contactLine = parseInt(req.body.contactLine, 10);
+      const nextOfKinContact = parseInt(req.body.nextOfKinContact, 10);
+  
 
       // const urls = [];
       // const OfficersFiles = req.files;
