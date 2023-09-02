@@ -97,10 +97,10 @@ export const createPoliceStation = async (req, res) => {
   // Update a police station
   export const updatePoliceStation = async (req, res) => {
     try {
-      const { name, location } = req.body;
+      const { name, location, officers } = req.body;
       const updatedStation = await PoliceStation.findByIdAndUpdate(
         req.params.id,
-        { name, location },
+        { name, location, officers },
         { new: true }
       );
       if (!updatedStation) {

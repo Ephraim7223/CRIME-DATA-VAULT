@@ -141,7 +141,7 @@ export const addCriminal = async(req, res) => {
             contactRelationship: contactRelationship,
             contactLine: contactLine,
             lastname: lastname,
-            name: firstname + " " + middlename + " " + lastname,
+            name: `${firstname} + " " + ${middlename} + " " + ${lastname}`,
             crime: crime,
             address :address,
             DOB: DOB,

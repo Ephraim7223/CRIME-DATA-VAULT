@@ -112,7 +112,7 @@ function generateRandomNumber(digits){
             maritalStatus:maritalStatus,
             firstname: firstname,
             lastname: lastname,
-            name: firstname + " " + middlename + " " + lastname,
+            name: `${firstname} + " " + ${middlename} + " " + ${lastname}`,
             DOB:DOB,
             occupation:occupation,
             town:town,

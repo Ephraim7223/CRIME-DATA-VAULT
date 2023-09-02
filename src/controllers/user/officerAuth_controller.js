@@ -103,7 +103,7 @@ export const officerSignup = async(req, res) => {
       image: urls.find(url => url.hasOwnProperty('image'))?.image,
       fingerPrints: urls.find(url => url.hasOwnProperty('fingerPrints'))?.fingerPrints,
       middleName: middleName,
-      name: firstName + " " + middleName + " " + lastName,
+      name: `${firstName} + " " + ${middleName} + " " + ${lastName}`,
       email: email,
       // password: encryptedPassword,
       nextOfKin: nextOfKin,
@@ -172,6 +172,29 @@ export const officerLogin = async (req, res) => {
 
   } catch (error) {
     console.error('Error during officer login:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+};
+
+export const officerLogout = async (req, res) => {
+  try {
+    // Assuming you have some way to identify the currently logged-in officer, like a session token or user ID
+    const officerId = req.user.id; // Replace with the appropriate way to identify the officer
+
+    // Find the officer by their ID
+    const officer = await Officer.findById(officerId);
+
+    if (!officer) {
+      return res.status(404).json({ error: 'Officer not found' });
+    }
+
+    // Clear the active session by setting it to false
+    officer.activeSession = false;
+    await officer.save();
+
+    res.status(200).json({ message: 'Logout successful' });
+  } catch (error) {
+    console.error('Error during officer logout:', error);
     res.status(500).json({ error: 'Internal server error' });
   }
 };
