@@ -39,7 +39,7 @@ export const adminSignup = async(req, res) => {
       ID: adminID,
       firstname: firstname,
       lastname: lastname,
-      name: firstname + ' ' + lastname,
+      name: `${firstname} ${lastname}`,
       password: encryptedPassword,
       email: req.body.email,
       isAdmin: true

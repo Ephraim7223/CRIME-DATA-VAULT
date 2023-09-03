@@ -96,7 +96,7 @@ export const officerSignup = async(req, res) => {
       image: urls.find(url => url.hasOwnProperty('image'))?.image,
       fingerPrints: urls.find(url => url.hasOwnProperty('fingerPrints'))?.fingerPrints,
       middleName: middleName,
-      name: `${firstName} + " " + ${middleName} + " " + ${lastName}`,
+      name: `${firstName} ${middleName} ${lastName}`,
       email: email,
       // password: encryptedPassword,
       nextOfKin: nextOfKin,
