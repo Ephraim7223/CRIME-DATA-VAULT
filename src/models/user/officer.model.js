@@ -1,7 +1,7 @@
 import { Schema, model } from "mongoose";
 
 function validateEmail(email) {
-    const emailRegex = /\S+@gmail.com\S+@email.com\.\S+/;
+    const emailRegex = /\S+@\S+\.\S+/;
     return emailRegex.test(email);
   }
   
@@ -77,10 +77,10 @@ const officerSchema = new Schema({
         unique: true,
         lowercase: true,
         trim: true,
-        validate: {
-            validator: validateEmail,
-            message: "Invalid email address",
-          },
+            validate: {
+      validator: validateEmail,
+      message: "Invalid email address",
+    },
         match: [/\S+@\S+\.\S+/, 'Invalid email address'],
     },
     currentStation: {
