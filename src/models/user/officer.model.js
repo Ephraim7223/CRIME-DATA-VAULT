@@ -2,7 +2,7 @@ import { Schema, model } from "mongoose";
 
 const officerSchema = new Schema({
 
-    loginID: { type: String, required: true, unique: true, default: " "},
+    loginID: { type: String, required: true,default: " "},
     password: { type: String, required: true ,default: " "},
     ID: {
         type: String,

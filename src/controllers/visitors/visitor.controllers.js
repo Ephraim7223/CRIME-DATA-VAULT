@@ -46,10 +46,6 @@ function generateRandomNumber(digits){
           const imageUrl= image.url || image.path;
           formData.image = imageUrl;
         }
-        const existingVisitorWithImage = await Criminal.findOne({ image: image.url || image.path });
-        if (existingVisitorWithImage) {
-          return res.status(409).json({ message: "Image already used by another visitor" });
-        }
     } else {
         const eyecolor = req.body.eyecolor
         const haircolor = req.body.haircolor
