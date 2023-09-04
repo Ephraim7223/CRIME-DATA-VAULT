@@ -8,18 +8,22 @@ export const getPendingUpdateRequests = async (req, res) => {
 
     // Process the pending requests to include necessary fields from the original data
     const processedPendingRequests = await Promise.all(pendingRequests.map(async request => {
-      const fieldsToUpdate = request.fieldsToUpdate;
-      const officerId = request.officerId
-      const criminalId = request.criminalId
+      const fieldsToUpdate = [];
+      const officerId = request.officerId;
+      const criminalId = request.criminalId;
       const originalData = await Criminal.findById(request.originalData.criminalId);
 
-      // Create an object containing only the fields that need to be updated
+      // Create an object containing the fields that need to be updated along with their new values
       const dataToUpdate = {};
-      fieldsToUpdate.forEach(field => {
+      for (const field of request.fieldsToUpdate) {
         if (originalData && originalData.hasOwnProperty(field)) {
           dataToUpdate[field] = originalData[field];
+          fieldsToUpdate.push({
+            field: field,
+            newValue: request.dataToUpdate[field], // Include the new value here
+          });
         }
-      });
+      }
 
       // Create a new object with the relevant information
       return {
@@ -27,8 +31,8 @@ export const getPendingUpdateRequests = async (req, res) => {
         officerId: officerId,
         criminalId: criminalId,
         originalData: request.originalData,
-        fieldsToUpdate: fieldsToUpdate,
-        dataToUpdate: dataToUpdate,
+        dataToUpdate: request.dataToUpdate,
+        fieldsToUpdate: request.fieldsToUpdate,
         comments: request.comments,
         // Add other necessary fields here
       };
@@ -44,40 +48,43 @@ export const getPendingUpdateRequests = async (req, res) => {
 export const getSinglePendingUpdateRequest = async (req, res) => {
   try {
     const requestId = req.params.requestId;
-
+    
     // Find the single pending update request by its ID
-    const pendingRequest = await PendingUpdateRequest.findById(requestId);
+    const request = await PendingUpdateRequest.findById(requestId);
 
-    if (!pendingRequest) {
+    if (!request) {
       return res.status(404).json({
         success: false,
         message: 'Pending update request not found!',
       });
     }
 
-    // Process the pending request to include necessary fields from the original data
-    const fieldsToUpdate = pendingRequest.fieldsToUpdate;
-    const officerId = pendingRequest.officerId;
-    const criminalId = pendingRequest.criminalId;
-    const originalData = await Criminal.findById(pendingRequest.originalData.criminalId);
+    const officerId = request.officerId;
+    const criminalId = request.criminalId;
+    const originalData = await Criminal.findById(request.originalData.criminalId);
 
-    // Create an object containing only the fields that need to be updated
+    // Create an object containing the fields that need to be updated along with their new values
+    const fieldsToUpdate = [];
     const dataToUpdate = {};
-    fieldsToUpdate.forEach(field => {
+    for (const field of request.fieldsToUpdate) {
       if (originalData && originalData.hasOwnProperty(field)) {
         dataToUpdate[field] = originalData[field];
+        fieldsToUpdate.push({
+          field: field,
+          newValue: request.dataToUpdate[field], // Include the new value here
+        });
       }
-    });
+    }
 
-    // Create an object with the relevant information
+    // Create a new object with the relevant information
     const processedPendingRequest = {
-      _id: pendingRequest._id,
+      _id: request._id,
       officerId: officerId,
       criminalId: criminalId,
-      originalData: pendingRequest.originalData,
-      fieldsToUpdate: fieldsToUpdate,
-      dataToUpdate: dataToUpdate,
-      comments: pendingRequest.comments,
+      originalData: request.originalData,
+      dataToUpdate: request.dataToUpdate,
+      fieldsToUpdate: request.fieldsToUpdate,
+      comments: request.comments,
       // Add other necessary fields here
     };
 

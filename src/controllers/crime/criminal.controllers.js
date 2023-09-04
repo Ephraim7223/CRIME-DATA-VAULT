@@ -51,7 +51,14 @@ export const addCriminal = async(req, res) => {
          res.status(409).json({message: "Criminal already exists"})
          if (image) {
          const imageUrl = image.url || image.path;
-         formData.image = imageUrl;}
+         formData.image = imageUrl;
+        } else {
+         res.status(400).json({ error: "Image not entered" });
+       }
+       const existingCriminalWithImage = await Criminal.findOne({ image: image.url || image.path });
+       if (existingCriminalWithImage) {
+         return res.status(409).json({ message: "Image already used by another criminal" });
+       }
     } else {
         const eyecolor = req.body.eyecolor
         const haircolor = req.body.haircolor
