@@ -33,7 +33,7 @@ upload("officers").fields([{
     ])
 , officerSignup);
 
-router.patch("/approve/:requestId", isAdmin,approveUpdateRequest);
+router.patch("/approve/:requestId",approveUpdateRequest);
 router.patch("/reject/:requestId", isAdmin,rejectUpdateRequest);
 
 router.post('/login', adminLogin);

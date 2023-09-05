@@ -13,8 +13,12 @@ export const approveUpdateRequest = async (req, res) => {
       });
     }
 
-    // Apply the updates to the criminal's data
-    const criminal = await Criminal.findById(updateRequest.originalData.criminalId);
+    // Retrieve the originalData.criminalId from the update request
+    const criminalId = updateRequest.originalData.criminalId;
+
+    // Find the associated criminal data
+    const criminal = await Criminal.findById(criminalId);
+
     if (!criminal) {
       return res.status(404).json({
         success: false,
@@ -58,6 +62,7 @@ export const approveUpdateRequest = async (req, res) => {
 function isValidDate(dateString) {
   return !isNaN(Date.parse(dateString));
 }
+
 
 
 

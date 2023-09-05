@@ -38,18 +38,17 @@ export const officerSignup = async(req, res) => {
     const image = req.file;
     const officer = await Officer.findOne({email:req.body.email})
       if (officer) {
-        res.status(409).json({message: "Officer already exists"})
+       return res.status(409).json({message: "Officer already exists"})
+      }
         if (image) {
           const imageUrl = image.url || image.path;
           formData.image = imageUrl;
-         } else {
-          res.status(400).json({ error: "Image not entered" });
-        }
+         }
         const existingOfficerWithImage = await Officer.findOne({ image: image.url || image.path });
         if (existingOfficerWithImage) {
           return res.status(409).json({ message: "Image already used by another officer" });
         }
-  } else {
+   else {
       // const encryptedPassword = hashValue(req.body.password)
       const middleName = req.body.middleName
       const email = req.body.email
