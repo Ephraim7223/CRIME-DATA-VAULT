@@ -99,6 +99,11 @@ const criminalSchema = new mongoose.Schema({
         required: true,
         default:" "
     },
+    video: {
+        type: String,
+        required: true,
+        default: " "
+    },
     image: {
         type: String,
         required: true,

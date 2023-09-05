@@ -113,7 +113,6 @@ export const addCriminal = async(req, res) => {
             }
           }
         }
-        
         // console.log("urls", urls)
         
         const newCriminal = new Criminal({
@@ -155,6 +154,7 @@ export const addCriminal = async(req, res) => {
             height: height,
             reportedBy:reportedBy,
             age: age, 
+            video: urls.find(url => url.hasOwnProperty('video'))?.video,
             bloodGroup: bloodGroup,
             weight: weight,
             eyecolor: eyecolor,

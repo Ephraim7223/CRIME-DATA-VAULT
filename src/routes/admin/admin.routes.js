@@ -16,7 +16,7 @@ router.get('/officers', getAllOfficers);
 router.get('/criminals', getAllCriminals);
 router.get('/visitors', getAllVisitors);
 router.get('/policeStation', getAllPoliceStations);
-router.get('/pendingrequests', getPendingUpdateRequests);
+router.get('/pendingrequests', isAdmin,getPendingUpdateRequests);
 router.get('/station/:stationId', getSinglePoliceStation);
 router.get('/officer/:officerId', getSingleOfficer);
 router.get('/criminal/:criminalId', getSingleCriminal);
@@ -33,7 +33,7 @@ upload("officers").fields([{
     ])
 , officerSignup);
 
-router.patch("/approve/:requestId",approveUpdateRequest);
+router.patch("/approve/:requestId", isAdmin,approveUpdateRequest);
 router.patch("/reject/:requestId", isAdmin,rejectUpdateRequest);
 
 router.post('/login', adminLogin);
