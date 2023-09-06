@@ -29,16 +29,21 @@ function generateRandomAlphaNumeric(length) {
 }
 
 // Function to generate a random alphanumeric password
-function generateRandomPassword(length = 8) {
-  const charset = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
-  let password = '';
-  for (let i = 0; i < length; i++) {
-    const randomIndex = Math.floor(Math.random() * charset.length);
-    password += charset.charAt(randomIndex);
-  }
-  return password;
-}
+// function generateRandomPassword(length = 8) {
+//   const charset = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+//   let password = '';
+//   for (let i = 0; i < length; i++) {
+//     const randomIndex = Math.floor(Math.random() * charset.length);
+//     password += charset.charAt(randomIndex);
+//   }
+//   return password;
+// }
 
+
+function hashValue(value) {
+  const hash = cryptoHash.createHash('sha256');
+  hash.update(value);
+ return  hash.digest('base64')}
 
 // Create a new police station
 export const createPoliceStation = async (req, res) => {
@@ -125,11 +130,11 @@ export const createPoliceStation = async (req, res) => {
     }
   };
 
-import bcrypt from 'bcrypt';
+  import  cryptoHash from "crypto";
 
 export const assignOfficerToStation = async (req, res) => {
   try {
-    const { officerID, stationID } = req.body;
+    const { officerID, stationID, password } = req.body;
 
     // Find the officer by ID
     const officer = await Officer.findOne({ ID: officerID });
@@ -149,14 +154,15 @@ export const assignOfficerToStation = async (req, res) => {
     const loginID = generateUniqueLoginID(); // Implement the logic to generate a unique login ID
 
     // Generate a random password for the officer
-    const randomPassword = generateRandomPassword(); // Implement the logic to generate a random password
+    // const randomPassword = generateRandomPassword(); // Implement the logic to generate a random password
 
     // Hash the password before saving it to the officer's document
-    const hashedPassword = await bcrypt.hash(randomPassword, 10);
+    // const hashedPassword = bcrypt.hash(password);
+    const encryptedPassword = hashValue(password)
 
     // Set the generated login ID and hashed password on the officer document
     officer.loginID = loginID;
-    officer.password = hashedPassword;
+    officer.password = encryptedPassword;
 
     // Assign the officer to the police station
     officer.station = policeStation._id;
@@ -172,7 +178,7 @@ export const assignOfficerToStation = async (req, res) => {
     res.json({ 
       message: 'Officer assigned to the police station successfully', 
       loginID: loginID,
-      password: randomPassword
+      password: password
     });
   } catch (error) {
     console.error('Error assigning officer:', error);
