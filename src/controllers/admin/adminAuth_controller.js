@@ -52,17 +52,6 @@ export const adminSignup = async(req, res) => {
   }
 };
 
-// export const verifyMail = async ({ email,ID}) => {
-//   try {
-//     const mailOtions = {
-//       from: "crimedatabase9@gmail.com",
-
-//     }
-//   }catch (error) {
-
-//   }
-// };
-
 export const adminLogin = async (req, res) => {
   const loginResult = loginValidator.safeParse(req.body);
   if (!loginResult.success) {
