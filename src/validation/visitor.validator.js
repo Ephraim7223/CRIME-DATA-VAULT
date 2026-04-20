@@ -1,7 +1,10 @@
-import {z} from "zod"
+import { z } from 'zod';
 
+const mongoId = z
+  .string()
+  .regex(/^[a-f0-9]{24}$/i, 'Invalid criminal id');
 
-export const addVisitorValidator =z.object({
+export const addVisitorValidator = z.object({
     firstname:z.string().min(2).max(10),
     lastname:z.string().min(2).max(10),
     middlename:z.string().min(2).max(10),
@@ -19,10 +22,14 @@ export const addVisitorValidator =z.object({
     Frequency:z.string(),
     bloodGroup:z.string(),
     lastVisitDate:z.string(),
-    inmateVisited:z.string(),
+    criminal: mongoId,
     LGA:z.string(),
     haircolor:z.string(),
-    // visitorAddress:z.string(),
+    Nationality: z.string().min(1),
+    occupation: z.string().min(1),
+    correctionalCenter: z.string().min(1),
+    visitPurpose: z.string().min(1),
+    maritalStatus: z.string().min(1),
     // 
     // 
     // 

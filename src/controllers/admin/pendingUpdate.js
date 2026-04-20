@@ -1,56 +1,52 @@
-import PendingUpdateRequest from "../../models/pending/pending.model.js";
-import Criminal from "../../models/criminal/criminal.models.js"; // Import the Criminal model
+import PendingUpdateRequest from '../../models/pending/pending.model.js';
 
 export const getPendingUpdateRequests = async (req, res) => {
   try {
-    // Fetch all pending update requests from the database
-    const pendingRequests = await PendingUpdateRequest.find({ isApproved: false });
+    const pendingRequests = await PendingUpdateRequest.find({
+      adminDecision: 'pending',
+    })
+      .populate('officerId', 'name ID email')
+      .populate('criminalId', 'ID name firstname lastname');
 
-    // Process the pending requests to include necessary fields from the original data
-    const processedPendingRequests = await Promise.all(pendingRequests.map(async request => {
-      const fieldsToUpdate = [];
-      const officerId = request.officerId;
-      const criminalId = request.criminalId;
-      const originalData = await Criminal.findById(request.originalData.criminalId);
+    const processedPendingRequests = pendingRequests.map((request) => {
+      const fieldsDetail = [];
+      const originalData = request.originalData;
 
-      // Create an object containing the fields that need to be updated along with their new values
-      const dataToUpdate = {};
       for (const field of request.fieldsToUpdate) {
-        if (originalData && originalData.hasOwnProperty(field)) {
-          dataToUpdate[field] = originalData[field];
-          fieldsToUpdate.push({
-            field: field,
-            newValue: request.dataToUpdate[field], // Include the new value here
+        if (originalData && Object.prototype.hasOwnProperty.call(originalData, field)) {
+          fieldsDetail.push({
+            field,
+            previousValue: originalData[field],
+            newValue: request.dataToUpdate[field],
           });
         }
       }
 
-      // Create a new object with the relevant information
       return {
         _id: request._id,
-        officerId: officerId,
-        criminalId: criminalId,
+        officerId: request.officerId,
+        criminalId: request.criminalId,
         originalData: request.originalData,
         dataToUpdate: request.dataToUpdate,
         fieldsToUpdate: request.fieldsToUpdate,
+        fieldsDetail,
         comments: request.comments,
-        // Add other necessary fields here
+        adminDecision: request.adminDecision,
+        createdAt: request.createdAt,
       };
-    }));
+    });
 
-    // Return the processed pending requests as the response
-    res.status(200).json(processedPendingRequests);
+    return res.status(200).json(processedPendingRequests);
   } catch (err) {
-    res.status(500).json({ message: err.message });
+    return res.status(500).json({ message: err.message });
   }
 };
 
 export const getSinglePendingUpdateRequest = async (req, res) => {
   try {
-    const requestId = req.params.requestId;
-    
-    // Find the single pending update request by its ID
-    const request = await PendingUpdateRequest.findById(requestId);
+    const request = await PendingUpdateRequest.findById(req.params.requestId)
+      .populate('officerId', 'name ID email')
+      .populate('criminalId', 'ID name firstname lastname');
 
     if (!request) {
       return res.status(404).json({
@@ -59,38 +55,33 @@ export const getSinglePendingUpdateRequest = async (req, res) => {
       });
     }
 
-    const officerId = request.officerId;
-    const criminalId = request.criminalId;
-    const originalData = await Criminal.findById(request.originalData.criminalId);
+    const fieldsDetail = [];
 
-    // Create an object containing the fields that need to be updated along with their new values
-    const fieldsToUpdate = [];
-    const dataToUpdate = {};
     for (const field of request.fieldsToUpdate) {
-      if (originalData && originalData.hasOwnProperty(field)) {
-        dataToUpdate[field] = originalData[field];
-        fieldsToUpdate.push({
-          field: field,
-          newValue: request.dataToUpdate[field], // Include the new value here
+      if (
+        request.originalData &&
+        Object.prototype.hasOwnProperty.call(request.originalData, field)
+      ) {
+        fieldsDetail.push({
+          field,
+          previousValue: request.originalData[field],
+          newValue: request.dataToUpdate[field],
         });
       }
     }
 
-    // Create a new object with the relevant information
-    const processedPendingRequest = {
+    return res.status(200).json({
       _id: request._id,
-      officerId: officerId,
-      criminalId: criminalId,
+      officerId: request.officerId,
+      criminalId: request.criminalId,
       originalData: request.originalData,
       dataToUpdate: request.dataToUpdate,
       fieldsToUpdate: request.fieldsToUpdate,
+      fieldsDetail,
       comments: request.comments,
-      // Add other necessary fields here
-    };
-
-    // Return the processed pending request as the response
-    res.status(200).json(processedPendingRequest);
+      adminDecision: request.adminDecision,
+    });
   } catch (err) {
-    res.status(500).json({ message: err.message });
+    return res.status(500).json({ message: err.message });
   }
 };

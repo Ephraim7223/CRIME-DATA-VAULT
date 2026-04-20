@@ -7,6 +7,7 @@ export const addCriminalValidator =z.object({
     middlename:z.string().min(2).max(20),
     DOB:z.string(),
     crime:z.string(),
+    category: z.enum(['Robbery', 'Murder', 'Sexual Assault', 'Cybercrime', 'Kidnapping']),
     occupation:z.string(),
     // image:z.string(),
     town:z.string(),

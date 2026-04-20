@@ -1,7 +1,6 @@
 import Criminal from "../../models/criminal/criminal.models.js";
 import { addCriminalValidator } from "../../validation/criminal.validator.js";
 import { formatZodError } from "../../utils/errorMessage.js";
-import upload from "../../config/multer.js";
 
 function generateRandomNumber(digits, baseNumber = 0) {
   const min = Math.pow(10, digits - 1);
@@ -45,21 +44,6 @@ export const addCriminal = async(req, res) => {
     }
   
     try{
-      const image = req.file;
-      const criminal = await Criminal.findOne({ID: req.body.ID});
-        if (criminal) {
-         res.status(409).json({message: "Criminal already exists"})
-         if (image) {
-         const imageUrl = image.url || image.path;
-         formData.image = imageUrl;
-        } else {
-         res.status(400).json({ error: "Image not entered" });
-       }
-       const existingCriminalWithImage = await Criminal.findOne({ image: image.url || image.path });
-       if (existingCriminalWithImage) {
-         return res.status(409).json({ message: "Image already used by another criminal" });
-       }
-    } else {
         const eyecolor = req.body.eyecolor
         const haircolor = req.body.haircolor
         const crime = req.body.crime
@@ -123,7 +107,7 @@ export const addCriminal = async(req, res) => {
             // fingerPrints: urls[1].fingerPrints,
             // image: imageUrl,
             // fingerPrint: fingerPrintUrl,
-            complexions:complexion,
+            complexion,
             Contactfirstname: Contactfirstname,
             fingerPrints: urls.find(url => url.hasOwnProperty('fingerPrints'))?.fingerPrints,
             Contactlastname : Contactlastname,
@@ -132,7 +116,6 @@ export const addCriminal = async(req, res) => {
             middlename: middlename,
             maritalStatus:maritalStatus,
             sentence: sentence,
-            complexion:complexion,
             dateCommitted: dateCommitted,
             dateConvicted: dateConvicted,
             nationality:nationality,
@@ -153,7 +136,7 @@ export const addCriminal = async(req, res) => {
             status: status,
             height: height,
             reportedBy:reportedBy,
-            age: age, 
+            age: String(age), 
             video: urls.find(url => url.hasOwnProperty('video'))?.video,
             bloodGroup: bloodGroup,
             weight: weight,
@@ -162,7 +145,6 @@ export const addCriminal = async(req, res) => {
         })
         await newCriminal.save()
         res.json(`Criminal ID is ${newCriminal.ID}`);
-      }
     } catch (err) {
         console.log(err);
       res.status(500).json({message: err.message});

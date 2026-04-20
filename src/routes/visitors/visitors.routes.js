@@ -1,18 +1,9 @@
-import { Router } from "express";
-const router  = Router();
+import { Router } from 'express';
+import { getAllVisitors } from '../../controllers/user/officer.controller.js';
+import { staffAuth } from '../../middlewares/auth.js';
 
-/** Import all controllers */
-import { getAllVisitors } from "../../controllers/user/officer.controller.js";
+const router = Router();
 
-/** POST METHODS */
-router.route('/addVisitor').post((req,res) =>res.json(''));
-
-/** GET METHODS */
-// router.route('/').get((req,res) => res.json(''));
-router.get('/', getAllVisitors);
-
-/** PUT METHODS */
-router.route('/updateVisitorss').put();
-
+router.get('/', ...staffAuth, getAllVisitors);
 
 export default router;
